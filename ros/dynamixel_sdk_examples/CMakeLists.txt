@@ -79,11 +79,16 @@ add_executable(indirect_address_node src/indirect_address_node.cpp)
 add_dependencies(indirect_address_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(indirect_address_node ${catkin_LIBRARIES})
 
+add_executable(velocity_controller_node src/velocity_controller_node.cpp)
+add_dependencies(velocity_controller_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(velocity_controller_node ${catkin_LIBRARIES})
+
+
 ################################################################################
 # Install
 ################################################################################
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS read_write_node sync_read_write_node bulk_read_write_node indirect_address_node
+install(TARGETS read_write_node sync_read_write_node bulk_read_write_node indirect_address_node velocity_controller_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

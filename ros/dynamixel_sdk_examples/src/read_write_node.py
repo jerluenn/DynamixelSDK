@@ -36,10 +36,9 @@
 #******************************************************************************/
 
 import os
+import sys
 import rospy
 from dynamixel_sdk import *
-from dynamixel_sdk_examples.srv import *
-from dynamixel_sdk_examples.msg import *
 
 if os.name == 'nt':
     import msvcrt
@@ -58,16 +57,16 @@ else:
         return ch
 
 # Control table address
-ADDR_TORQUE_ENABLE      = 64               # Control table address is different in Dynamixel model
-ADDR_GOAL_POSITION      = 116
-ADDR_PRESENT_POSITION   = 132
+ADDR_MOVING_SPEED = 32
+MOVING_SPEED_VALUE = 500
+ADDR_TORQUE_ENABLE = 24
 
 # Protocol version
 PROTOCOL_VERSION            = 2.0               # See which protocol version is used in the Dynamixel
 
 # Default setting
-DXL_ID                      = 1                 # Dynamixel ID : 1
-BAUDRATE                    = 57600             # Dynamixel default baudrate : 57600
+DXL_ID                      = 12              # Dynamixel ID : 1
+BAUDRATE                    = 1000000             # Dynamixel default baudrate : 57600
 DEVICENAME                  = '/dev/ttyUSB0'    # Check which port is being used on your controller
                                                 # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
 
@@ -80,19 +79,10 @@ DXL_MOVING_STATUS_THRESHOLD = 20                # Dynamixel moving status thresh
 portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_VERSION)
 
-def set_goal_pos_callback(data):
-    print("Set Goal Position of ID %s = %s" % (data.id, data.position))
-    dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, data.id, ADDR_GOAL_POSITION, data.position)
-
-def get_present_pos(req):
-    dxl_present_position, dxl_comm_result, dxl_error = packetHandler.read4ByteTxRx(portHandler, req.id, ADDR_PRESENT_POSITION)
-    print("Present Position of ID %s = %s" % (req.id, dxl_present_position))
-    return dxl_present_position
-
 def read_write_py_node():
     rospy.init_node('read_write_py_node')
-    rospy.Subscriber('set_position', SetPosition, set_goal_pos_callback)
-    rospy.Service('get_position', GetPosition, get_present_pos)
+    packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_MOVING_SPEED, 0)
+    packetHandler.read2ByteTxRx(portHandler, DXL_ID, 39)
     rospy.spin()
 
 def main():
